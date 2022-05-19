@@ -1,41 +1,38 @@
-#include "main.h"
+#include "holberton.h"
 
 /**
- * main - prints a simple shell
- * @ac: number of arguments
- * @argv: arrays of arguments
- *
- * Return: Always 0.
+ * main - entry point for application
+ * @ac: argument count
+ * @av: argument vector
+ * Return: 0 on success
  */
-int main(int ac, char **argv)
+int main(int ac, char **av)
 {
-	char *prog_name = argv[0];
-	char *command;
-	size_t len = 100;
-	size_t command_char;
+	config build;
 
-	command = malloc(len * sizeof(char));
-
-	if (command == NULL)
-		exit(1);
-
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-		{
-			char *prompt = "$ ";
-
-			write(STDOUT_FILENO, prompt, strlen(prompt) + 1);
-		}
-
-		if (getline(&command, &len, stdin) == -1)
-		{
-			if (isatty(STDIN_FILENO))
-				write(STDOUT_FILENO, "\n", 2);
-
-			free(command);
-		}
-	}
-
+	(void)ac;
+	signal(SIGINT, sigintHandler);
+	configInit(&build);
+	build.shellName = av[0];
+	shell(&build);
 	return (0);
+}
+
+/**
+ * configInit - initialize member values for config struct
+ * @build: input build
+ * Return: build with initialized members
+ */
+config *configInit(config *build)
+{
+	build->env = generateLinkedList(environ);
+	build->envList = NULL;
+	build->args = NULL;
+	build->buffer = NULL;
+	build->path = _getenv("PATH", environ);
+	build->fullPath = NULL;
+	build->lineCounter = 0;
+	build->shellName = NULL;
+	build->errorStatus = 0;
+	return (build);
 }

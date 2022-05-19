@@ -1,84 +1,155 @@
-#include "shell.h"
-
-
-/**
- * _strlen - count the leng of s
- * @s: pointer received
- * Return: the lenght of the character received
- */
-
-int _strlen(char *s)
-{
-int i = 0;
-
-while (*(s + i) != 0)
-i++;
-return (i);
-}
+#include "header.h"
 
 /**
- * _strcmp - compair 2 strings
- * @s1: the first string
- * @s2: second string
- * Return: a number
- */
+ * _strlen - Counts the length of a string
+ * @str: string to count
+ *
+ * Return: the ammount of chars of the string
+*/
 
-int _strcmp(char *s1, char *s2)
+int _strlen(char *str)
 {
-if (s1 == NULL || s2 == NULL)
-return (-1);
-while ((*s1 == *s2)  && (*s1 != '\0'))
-{
-s1++;
-s2++;
-}
-return (*s1 - *s2);
-}
-/**
- * print_string - print a string
- * @string: the string
- * Return: nothing
- */
+	int i;
 
-void print_string(char *string)
-{
-int i = 0, count = 0;
-char *buffer;
+	for (i = 0; str[i]; i++)
+	{
+	}
 
-count = _strlen(string);
-buffer = (char *)malloc(sizeof(char) * count + 2);
-while (i < count)
-{
-buffer[i] = string[i];
-i++;
-}
-buffer[i] = '\0';
-write(1, buffer, count);
-free(buffer);
+	return (i);
 }
 
 /**
- * _strcat - function that append the contain in src in the buffer of dest
- * @dest: the destination to append
- * @src: the text to copy
- * Return: a char pointer
- */
+ * _strdup - duplicates a given string
+ * @str: string to duplicae
+ *
+ * Return: A pointer to a duplicate of the string given
+*/
 
-char *_strcat(char *dest, char *src)
+char *_strdup(char *str)
 {
-int i = 0;
-int x = 0;
+	char *dup;
+	int i;
 
-while (dest[i] != '\0')
-{
-i++;
+	for (i = 0; str[i]; i++)
+	{
+	}
+
+	dup = malloc((sizeof(char) * i) + 1);
+	if (!dup)
+	{
+		write(2, "Unable to allocate memory", 25);
+		exit(1);
+	}
+
+	for (i = 0; str[i]; i++)
+	{
+		dup[i] = str[i];
+	}
+	dup[i] = '\0';
+
+	return (dup);
 }
-while (src[x] != '\0')
+
+/**
+ * split_line - splits a string into a 2d array based on delim
+ * @str: string to split
+ * @delim: delimiter to take into account to split the string
+ *
+ * Return: A double pointer of chars with the string splitted
+*/
+
+char **split_line(char *str, char *delim)
 {
-dest[i] = src[x];
-x++;
-i++;
+	int i, j, chars, lines = 1;
+	char **splitted, *token, *strdup;
+
+	strdup = _strdup(str);
+
+	for (i = 0; strdup[i]; i++)
+		if (strdup[i] == delim[0] || strdup[i] == delim[1])
+			lines++;
+
+	splitted = malloc((lines + 1) * sizeof(char *));
+	if (!splitted)
+	{
+		write(2, "Unable to allocate memory", 25);
+		exit(1);
+	}
+	token = strtok(strdup, delim);
+	j = 0;
+	while (token)
+	{
+		chars = _strlen(token);
+		splitted[j] = malloc((chars + 1) * sizeof(char));
+		if (!splitted)
+		{
+			write(2, "Unable to allocate memory", 25);
+			for (; j != 0 ; j--)
+				free(splitted[j - 1]);
+			free(splitted);
+			exit(1);
+			}
+		for (i = 0; i < chars; i++)
+		{
+			splitted[j][i] = token[i];
+		}
+		splitted[j][i] = '\0';
+		j++;
+		token = strtok(0, delim);
+	}
+	splitted[j] = NULL;
+	free(strdup);
+	return (splitted);
 }
-dest[i] = '\0';
-return (dest);
+
+/**
+ * _strcmp - Compares two arrays
+ * @origin: 1st array
+ * @comp: 2nd array
+ *
+ * Return: 1 if same, 0 if different
+*/
+
+int _strcmp(char *origin, char *comp)
+{
+	int i;
+
+	for (i = 0; origin[i] && comp[i]; i++)
+	{
+		if (origin[i] != comp[i])
+			break;
+	}
+
+	if (i == _strlen(origin) && i == _strlen(comp))
+		return (1);
+	else
+		return (0);
+}
+
+/**
+ * numbertostring - Calculates the ammount of digits
+ * @n: number to evaluate
+ *
+ * Return: The ammount of digits
+*/
+
+char *numbertostring(int n)
+{
+	int i = 0, j, number = n;
+	char *strnumber;
+
+	for (i = 0; n != 0; i++)
+	{
+		n = n / 10;
+	}
+
+	strnumber = malloc(sizeof(char) * (i + 1));
+
+	for (j = 1; j <= i; j++)
+	{
+		strnumber[i - j] = (number % 10) + '0';
+		number = number / 10;
+	}
+	strnumber[i] = '\0';
+	return (strnumber);
 }
